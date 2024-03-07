@@ -443,10 +443,16 @@ docker_setup_db() {
 	fi
 
 	# second schema and user
+	local createDatabase=
+	# Creates a custom database and user if specified
+	if [ -n "$MARIADB_DATABASE2" ]; then
+		mysql_note "Creating database ${MARIADB_DATABASE2}"
+		createDatabase="CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE2\`;"
+	fi
 	local createUser=
 	local userGrants=
 	if  [ -n "$MARIADB_PASSWORD2" ] || [ -n "$MARIADB_PASSWORD_HASH2" ] && [ -n "$MARIADB_USER2" ]; then
-		mysql_note "Creating user ${MARIADB_USER}"
+		mysql_note "Creating user ${MARIADB_USER2}"
 		if [ -n "$MARIADB_PASSWORD_HASH2" ]; then
 			createUser="CREATE USER '$MARIADB_USER2'@'%' IDENTIFIED BY PASSWORD '$MARIADB_PASSWORD_HASH2';"
 		else
