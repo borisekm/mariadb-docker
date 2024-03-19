@@ -443,28 +443,28 @@ docker_setup_db() {
 	fi
 
 	# second schema and user
-	local createDatabase=
+	local createDatabase2=
 	# Creates a custom database and user if specified
 	if [ -n "$MARIADB_DATABASE2" ]; then
 		mysql_note "Creating database ${MARIADB_DATABASE2}"
-		createDatabase="CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE2\`;"
+		createDatabase2="CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE2\`;"
 	fi
-	local createUser=
-	local userGrants=
+	local createUser2=
+	local userGrants2=
 	if  [ -n "$MARIADB_PASSWORD2" ] || [ -n "$MARIADB_PASSWORD_HASH2" ] && [ -n "$MARIADB_USER2" ]; then
 		mysql_note "Creating user ${MARIADB_USER2}"
 		if [ -n "$MARIADB_PASSWORD_HASH2" ]; then
-			createUser="CREATE USER '$MARIADB_USER2'@'%' IDENTIFIED BY PASSWORD '$MARIADB_PASSWORD_HASH2';"
+			createUser2="CREATE USER '$MARIADB_USER2'@'%' IDENTIFIED BY PASSWORD '$MARIADB_PASSWORD_HASH2';"
 		else
 			# SQL escape the user password, \ followed by '
 			local userPasswordEscaped
 			userPasswordEscaped=$(docker_sql_escape_string_literal "${MARIADB_PASSWORD2}")
-			createUser="CREATE USER '$MARIADB_USER2'@'%' IDENTIFIED BY '$userPasswordEscaped';"
+			createUser2="CREATE USER '$MARIADB_USER2'@'%' IDENTIFIED BY '$userPasswordEscaped';"
 		fi
 
 		if [ -n "$MARIADB_DATABASE2" ]; then
 			mysql_note "Giving user ${MARIADB_USER2} access to schema ${MARIADB_DATABASE2}"
-			userGrants="GRANT ALL ON \`${MARIADB_DATABASE2//_/\\_}\`.* TO '$MARIADB_USER2'@'%';"
+			userGrants2="GRANT ALL ON \`${MARIADB_DATABASE2//_/\\_}\`.* TO '$MARIADB_USER2'@'%';"
 		fi
 	fi
 
@@ -511,8 +511,11 @@ docker_setup_db() {
 		-- create users/databases
 		${createDatabase}
 		${createUser}
+		${createDatabase2}
+		${createUser2}
 		${createReplicaUser}
 		${userGrants}
+		${userGrants2}
 
 		${changeMasterTo}
 		${startReplica}
