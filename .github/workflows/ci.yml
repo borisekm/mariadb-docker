@@ -25,7 +25,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v3
       with:
-        context: ./10.11
-        file: ./Dockerfile
+        context: .
+        file: ./10.11/Dockerfile
         push: true
         tags: bmichalko/mariadb-cns:10.11
